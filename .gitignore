@@ -11,11 +11,6 @@
 # production
 /build
 
-.src/firebase.js/
-src/new.js
-new.js
-
-
 # misc
 .DS_Store
 .env.local
@@ -23,16 +18,9 @@ new.js
 .env.test.local
 .env.production.local
 
-.src/firebase.js/
-src/new.js
-new.js
-
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 #files
-.src/firebase.js/
-src/new.js
 new.js
