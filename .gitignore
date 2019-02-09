@@ -4,17 +4,16 @@
 /node_modules
 /.pnp
 .pnp.js
-.src/firebase.js/
-
 
 # testing
 /coverage
-.src/firebase.js/
-
 
 # production
 /build
+
 .src/firebase.js/
+src/new.js
+new.js
 
 
 # misc
@@ -23,7 +22,10 @@
 .env.development.local
 .env.test.local
 .env.production.local
+
 .src/firebase.js/
+src/new.js
+new.js
 
 
 npm-debug.log*
@@ -32,3 +34,5 @@ yarn-error.log*
 
 #files
 .src/firebase.js/
+src/new.js
+new.js
