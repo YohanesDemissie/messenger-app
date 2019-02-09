@@ -9,7 +9,7 @@ class Register extends Component {
 
   render() {
     return (
-      <Grid textAlign="center" verticalAlign="middle">
+      <Grid textAlign="center" verticalAlign="middle" className='app'>
         <Grid.Column style={{ width: 450 }}>
           <Header as="h2" icon color="orange">
             <Icon name="puzzle piece" color="orange" />
@@ -33,7 +33,7 @@ class Register extends Component {
             </Segment>
           </Form>
           <Message>
-            Already a user?<Link to='/login'/>
+            Already a user? <Link to='/login'> Login</Link>
           </Message>
         </Grid.Column>
       </Grid>
