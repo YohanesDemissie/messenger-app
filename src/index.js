@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 
 import React, { Component, Fragment } from 'react';
-import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom';
+import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom'; //withRouter is used down below to allow logged in users to go straight to home page
 import firebase from './firebase';
 
 import Home from './components/Home';
@@ -10,11 +10,19 @@ import Register from './components/Auth/Register.js';
 import "semantic-ui-css/semantic.min.css"; //lets change this later to raw styling
 import './styles/App.css';
 
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+const store = createStore(() => {}, composeWithDevTools());
+
 
 class Root extends Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
+        //setUser(user) will eventually put data in global state
+        console.log(user);
         this.props.history.push('/'); //redirects user to homeroute if firebause detects authorized user (aka when user logs in)
       }
     })
@@ -30,10 +38,11 @@ class Root extends Component {
   }
 }
 
-const RootWithAuth = withRouter(Root)
+const RootWithAuth = withRouter(Root) //this allows logged in users to go straight to home page on app load
 
-ReactDOM.render(<Router><RootWithAuth /></Router>, document.getElementById('root'));
-
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import App from './App';
+ReactDOM.render(
+  <Provider store={store}>
+    <Router>
+      <RootWithAuth />
+    </Router>
+  </Provider>, document.getElementById('root'));
