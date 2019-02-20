@@ -14,7 +14,7 @@ import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import rootReducer from './reducers';
-import { setUser } from './actions';
+import { setUser, clearUser } from './actions';
 import Spinner from './components/Spinner'
 
 const store = createStore(rootReducer, composeWithDevTools()); //holds user_reducer properties in actions 
@@ -28,6 +28,9 @@ class Root extends Component {
         this.props.setUser(user);
         //console.log(user);
         this.props.history.push('/'); //redirects user to homeroute if firebause detects authorized user (aka when user logs in)
+      } else {
+        this.props.history.push('./login');
+        this.props.clearUser();
       }
     })
   }
@@ -35,8 +38,8 @@ class Root extends Component {
     return this.props.isLoading ? <Spinner /> :(
       <Fragment>
           <Route exact path='/' component={App} />
-          <Route exact path='/Login' component={Login} />
-          <Route exact path='/Register' component={Register} />
+          <Route exact path='/login' component={Login} />
+          <Route exact path='/register' component={Register} />
         </Fragment>
     );
   }
@@ -47,7 +50,7 @@ const mapStateToProps = state => ({
 })
 
 
-const RootWithAuth = withRouter(connect(mapStateToProps, { setUser })(Root)) //this allows logged in users to go straight to home page on app load
+const RootWithAuth = withRouter(connect(mapStateToProps, { setUser, clearUser })(Root)) //this allows logged in users to go straight to home page on app load/logout user and go straight to login page when not signed in
 
 ReactDOM.render(
   <Provider store={store}>
