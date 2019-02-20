@@ -4,7 +4,7 @@ import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom'; //withRouter is used down below to allow logged in users to go straight to home page
 import firebase from './firebase';
 
-import Home from './components/Home';
+import App from './App';
 import Login from './components/Auth/Login.js';
 import Register from './components/Auth/Register.js';
 import "semantic-ui-css/semantic.min.css"; //lets change this later to raw styling
@@ -34,7 +34,7 @@ class Root extends Component {
   render() {
     return this.props.isLoading ? <Spinner /> :(
       <Fragment>
-          <Route exact path='/' component={Home} />
+          <Route exact path='/' component={App} />
           <Route exact path='/Login' component={Login} />
           <Route exact path='/Register' component={Register} />
         </Fragment>
