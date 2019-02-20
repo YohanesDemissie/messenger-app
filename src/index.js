@@ -15,12 +15,14 @@ import { Provider, connect } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import rootReducer from './reducers';
 import { setUser } from './actions';
+import Spinner from './components/Spinner'
 
 const store = createStore(rootReducer, composeWithDevTools()); //holds user_reducer properties in actions 
 
 
 class Root extends Component {
   componentDidMount() {
+    console.log(this.props.isLoading); //prints true or false depending on the user being logged in or not
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.props.setUser(user);
@@ -30,8 +32,8 @@ class Root extends Component {
     })
   }
   render() {
-    return (
-        <Fragment>
+    return this.props.isLoading ? <Spinner /> :(
+      <Fragment>
           <Route exact path='/' component={Home} />
           <Route exact path='/Login' component={Login} />
           <Route exact path='/Register' component={Register} />
@@ -40,7 +42,12 @@ class Root extends Component {
   }
 }
 
-const RootWithAuth = withRouter(connect(null, { setUser })(Root)) //this allows logged in users to go straight to home page on app load
+const mapStateToProps = state => ({
+  isLoading: state.user.isLoading
+})
+
+
+const RootWithAuth = withRouter(connect(mapStateToProps, { setUser })(Root)) //this allows logged in users to go straight to home page on app load
 
 ReactDOM.render(
   <Provider store={store}>
