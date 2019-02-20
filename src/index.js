@@ -11,18 +11,20 @@ import "semantic-ui-css/semantic.min.css"; //lets change this later to raw styli
 import './styles/App.css';
 
 import { createStore } from 'redux';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import rootReducer from './reducers';
+import { setUser } from './actions';
 
-const store = createStore(() => {}, composeWithDevTools());
+const store = createStore(rootReducer, composeWithDevTools()); //holds user_reducer properties in actions 
 
 
 class Root extends Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        //setUser(user) will eventually put data in global state
-        console.log(user);
+        this.props.setUser(user);
+        //console.log(user);
         this.props.history.push('/'); //redirects user to homeroute if firebause detects authorized user (aka when user logs in)
       }
     })
@@ -38,7 +40,7 @@ class Root extends Component {
   }
 }
 
-const RootWithAuth = withRouter(Root) //this allows logged in users to go straight to home page on app load
+const RootWithAuth = withRouter(connect(null, { setUser })(Root)) //this allows logged in users to go straight to home page on app load
 
 ReactDOM.render(
   <Provider store={store}>
