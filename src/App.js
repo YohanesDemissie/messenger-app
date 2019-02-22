@@ -13,7 +13,7 @@ import MetaPanel from './components/MetaPanel/MetaPanel';
 const App = ({ currentUser }) => (
       <Grid columns='equal' className='app' style={{ background: '#eee'}}>
         <ColorPanel />
-        <SidePanel currentUSer={currentUser} />
+        <SidePanel currentUser={currentUser} />
         <Grid.Column style={{marginLeft: 320}}>
           <Message />
         </Grid.Column>
@@ -24,7 +24,7 @@ const App = ({ currentUser }) => (
 )
 
 const mapStateToProps = state => ({
-  currentUSer: state.user.currentUser
+  currentUser: state.user.currentUser
 })
 
 export default connect(mapStateToProps)(App);

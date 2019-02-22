@@ -10,7 +10,11 @@ class UserPanel extends Component {
   dropDownOptions = () => [
     {
       key: 'user',
-      text: <span>Signed in as<strong>{this.state.user.displayName}</strong></span>,
+      text: (
+      <span>
+        Signed in as<strong>{this.state.user.displayName}</strong>
+      </span>
+      ),
       disabled: true,
     },
     {
