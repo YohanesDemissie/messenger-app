@@ -12,6 +12,20 @@ class Channels extends Component {
     modal: false
   }
 
+  componentDidMount() {
+    this.addListeners()
+  }
+
+  addListeners = () => { //Section 7, Lecture 23 for more in depth clarity
+    let loadedChannels = [];
+    this.state.channelsRef.on('child_added', snap => { //listens to every new child added
+      loadedChannels.push(snap.val()); //push the value of each snap to values array
+      console.log(loadedChannels);
+      this.setState({ channels: loadedChannels }) //set the channels part of state to loadedChannels
+
+    })
+  }
+
   addChannel = () => {
     const { channelsRef, channelName, channelDetails, user } = this.state;
 
@@ -53,6 +67,19 @@ class Channels extends Component {
     this.setState({ [event.target.name]: event.target.value}) //event being the argument, targeting the name, giving a new value based on use input
   }
 
+  displayChannels = channels =>
+    channels.length > 0 && channels.map(channel => ( //making sure channels length is greater than 0 & mapping through array of channels
+      <Menu.Item
+        key={channel.id}
+        onClick={() => console.log(channel)}
+        name={channel.name}
+        style={{opacity: 0.7 }}
+      >
+        # {channel.name}
+      </Menu.Item>
+    ));
+
+
   isFormValid = ({ channelName, channelDetails }) => channelName && channelDetails //making sure there are values for channelName and channelDetails
 
   openModal = () => this.setState({ modal: true })
@@ -70,6 +97,7 @@ class Channels extends Component {
             </span> {" "}
             ({ channels.length }) <Icon name="add" onClick={this.openModal}/>
           </Menu.Item>
+          {this.displayChannels(channels)}
         </Menu.Menu>
           <Modal basic open={modal} onClose={this.closeModal}>
             <Modal.Header>Add a channel</Modal.Header>
