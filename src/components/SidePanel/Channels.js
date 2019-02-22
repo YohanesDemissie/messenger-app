@@ -1,18 +1,59 @@
 import React, { Component, Fragment } from 'react';
+import firebase from '../../firebase';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
 
 class Channels extends Component {
   state = {
+    user: this.props.currentUser,
     channels: [],
     channelName: '',
     channelDetails: '',
+    channelsRef: firebase.database().ref('channels'), //ARBITRARY FROM FIREBASE DOCUMENTATIONS. .ref() TEXT CREATED IN REFERENCE TO
     modal: false
+  }
+
+  addChannel = () => {
+    const { channelsRef, channelName, channelDetails, user } = this.state;
+
+    const key = channelsRef.push().key; //takes channel ref, use the push mehtod, get the key property which should give us a unique identifier for every new channel created
+
+    const newChannel = {
+      id: key,
+      name: channelName,
+      details: channelDetails,
+      createdBy: {
+        name: user.displayName,
+        avatar: user.photoURL
+
+      }
+    }
+
+    channelsRef
+      .child(key)
+      .update(newChannel)
+      .then(() => {
+        this.setState({ channelName: '', channelDetails: ''});
+        this.closeModal();
+        console.log('channel added', channelName)
+      })
+      .catch(error => {
+        console.error(error)
+      })
+  }
+
+  handleSubmit = event => {
+    event.preventDefault();
+    if (this.isFormValid(this.state)) {
+      this.addChannel();
+    }
   }
 
   //UPDATE THE STATE OBJECT ACCORDING TO THE NAME PROPERTY OF THE INPUT THE USER IS TYPING IN
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value}) //event being the argument, targeting the name, giving a new value based on use input
   }
+
+  isFormValid = ({ channelName, channelDetails }) => channelName && channelDetails //making sure there are values for channelName and channelDetails
 
   openModal = () => this.setState({ modal: true })
 
@@ -33,7 +74,7 @@ class Channels extends Component {
           <Modal basic open={modal} onClose={this.closeModal}>
             <Modal.Header>Add a channel</Modal.Header>
             <Modal.Content>
-              <Form>
+              <Form onSubmit={this.handleSubmit}>
                 <Form.Field>
                   <Input
                     fluid
@@ -55,7 +96,7 @@ class Channels extends Component {
             </Modal.Content>
 
             <Modal.Actions>
-              <Button color="green" inverted>
+              <Button color="green" inverted onClick={this.handleSubmit}>
                 <Icon name="checkmark" /> Add
               </Button>
 
