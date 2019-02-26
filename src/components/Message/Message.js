@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Segment, Comment} from 'semantic-ui-react';
+import MessagesHeader from './MessagesHeader';
+import MessageForm from './MessageForm'
 
-class Message extends Component {
+class Messages extends Component {
   render() {
     return (
       <React.Fragment>
-        <MessegesHeader />
+        <MessagesHeader />
 
         <Segment>
           <Comment.Group className="messages">
@@ -18,4 +20,4 @@ class Message extends Component {
   }
 }
 
-export default Message;
+export default Messages;
