@@ -10,7 +10,7 @@ class ColorPanel extends Component {
         inverted
         visible
         width="very thin"
-        ColorPanel
+        // ColorPanel
       >
       <Divider />
       <Button icon="add" size="small" color="blue" />

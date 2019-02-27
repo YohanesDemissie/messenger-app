@@ -35,7 +35,7 @@ class MessageForm extends Component {
     if (message) {
       this.setState({ loading: true});
       messagesRef
-        .child(channel.Id)
+        .child(channel.id)
         .push()
         .set(this.createMessage())
         .then(() => {
@@ -49,20 +49,21 @@ class MessageForm extends Component {
           })
         })
     } else {
-      this.setState({ 
+      this.setState({
         errors: this.state.errors.concat({ message: 'Add a messages'})
       })
     }
   }
 
   render() {
-    const { errors } = this.state
+    const { errors, message, loading } = this.state //passing in error for sending empty string message, passing message... for obvious reasons, and loading to false, temporary, when message is sent so button isn't accidentally pressed twice
     return(
       <Segment className="message__form">
         <Input
           fluid
           name="message"
           onChange={this.handleChange}
+          value={message}
           style={{ marginBottom: "0.7em" }}
           label={<Button icon={'add'} />}
           labelPosition="left"
@@ -74,6 +75,7 @@ class MessageForm extends Component {
         <Button.Group icon width="2">
           <Button
             onClick={this.sendMessage}
+            disabled={loading}
             color="orange"
             content="Add Reply"
             labelPosition="left"
