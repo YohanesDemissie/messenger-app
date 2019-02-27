@@ -28,3 +28,8 @@ body,
   border-left: 2px solid orange;
   padding-left: 8px;
 }
+
+/* uplopad images styling */
+.message__image {
+  padding: 1em;
+}
