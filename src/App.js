@@ -4,18 +4,25 @@ import { Grid, GridColumn } from 'semantic-ui-react';
 // import './styles/App.css';
 import ColorPanel from './components/ColorPanel/ColorPanel';
 import SidePanel from './components/SidePanel/SidePanel';
-import Message from './components/Message/Message';
+import Message from './components/Message/Messages';
 import MetaPanel from './components/MetaPanel/MetaPanel';
 
 
 
 
-const App = ({ currentUser }) => (
+const App = ({ currentUser, currentChannel }) => (
       <Grid columns='equal' className='app' style={{ background: '#eee'}}>
         <ColorPanel />
-        <SidePanel currentUser={currentUser} />
+        <SidePanel
+          key={currentUser && currentUser.id}
+          currentUser={currentUser} 
+        />
         <Grid.Column style={{marginLeft: 320}}>
-          <Message />
+          <Message
+            key={currentChannel && currentChannel.id}
+            currentChannel={currentChannel}
+            currentUser={currentUser}
+          />
         </Grid.Column>
         <Grid.Column width={4}>
           <MetaPanel />
@@ -24,7 +31,8 @@ const App = ({ currentUser }) => (
 )
 
 const mapStateToProps = state => ({
-  currentUser: state.user.currentUser
+  currentUser: state.user.currentUser,
+  currentChannel: state.channel.currentChannel
 })
 
 export default connect(mapStateToProps)(App);
