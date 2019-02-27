@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Segment, Button, Input } from 'semantic-ui-react'
 import firebase from '../../firebase';
+import FileModal from './FileModal';
 
 class MessageForm extends Component {
   state = {
@@ -8,8 +9,12 @@ class MessageForm extends Component {
     channel: this.props.currentChannel,
     user: this.props.currentUser,
     loading: false,
-    errors: []
+    errors: [],
+    modal: false
   }
+
+  openModal = () => this.setState({ modal: true });
+  closeModal = () => this.setState({ modal: false });
 
   handleChange = event => { //used to handle prop change in message input
     this.setState({ [event.target.name]: event.target.value })
@@ -56,7 +61,7 @@ class MessageForm extends Component {
   }
 
   render() {
-    const { errors, message, loading } = this.state //passing in error for sending empty string message, passing message... for obvious reasons, and loading to false, temporary, when message is sent so button isn't accidentally pressed twice
+    const { errors, message, loading, modal } = this.state //passing in error for sending empty string message, passing message... for obvious reasons, and loading to false, temporary, when message is sent so button isn't accidentally pressed twice
     return(
       <Segment className="message__form">
         <Input
@@ -83,9 +88,14 @@ class MessageForm extends Component {
           />
           <Button
             color="teal"
+            onClick={this.openModal}
             content="upload Media"
             labelPosition="right"
             icon="cloud upload"
+          />
+          <FileModal 
+            modal={modal}
+            closeModal={this.closeModal}
           />
         </Button.Group>
         MessageForm Page
