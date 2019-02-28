@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import firebase from '../../firebase';
 import { connect } from 'react-redux';
-import { setCurrentChannel } from '../../actions';
+import { setCurrentChannel, setPrivateChannel } from '../../actions';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
 
 class Channels extends Component {
@@ -30,9 +30,8 @@ class Channels extends Component {
       loadedChannels.push(snap.val()); //push the value of each snap to values array
       console.log(loadedChannels);
       this.setState({ channels: loadedChannels }, () => this.setFirstChannel()) //set the channels part of state to loadedChannels
-
-    })
-  }
+    });
+  };
 
   removeListeners = () => {
     this.state.channelsRef.off(); //turns off event listeners for events that aren't going to happens the user navigates through the app
@@ -45,7 +44,7 @@ class Channels extends Component {
       this.setActiveChannel(firstChannel); //by default displays channel that is currently active
     }
     this.setState({ firstLoad: false })
-  }
+  };
 
   addChannel = () => {
     const { channelsRef, channelName, channelDetails, user } = this.state;
@@ -59,7 +58,6 @@ class Channels extends Component {
       createdBy: {
         name: user.displayName,
         avatar: user.photoURL
-
       }
     }
 
@@ -73,8 +71,8 @@ class Channels extends Component {
       })
       .catch(error => {
         console.error(error)
-      })
-  }
+      });
+  };
 
   handleSubmit = event => {
     event.preventDefault();
@@ -91,6 +89,7 @@ class Channels extends Component {
   changeChannel = channel => {
     this.setActiveChannel(channel) //pass in changed  channel to pass in active channel
     this.props.setCurrentChannel(channel) //takes the channel and puts it in global state
+    this.props.setPrivateChannel(false)
   }
 
   setActiveChannel = channel => {
@@ -169,4 +168,4 @@ class Channels extends Component {
   }
 }
 
-export default connect(null, { setCurrentChannel })(Channels)
+export default connect(null, { setCurrentChannel, setPrivateChannel })(Channels)
