@@ -52,9 +52,9 @@ class Messages extends React.Component {
 
   handleSearchMessages = () => {
     const channelMessages = [...this.state.messages]; //copy the messages array and assign it for channel messages so we dont mutate original array
-    const regex = new RegExp(this.state.searchTerm, "\gi"); //indicates regex to apply globbally and case sensitive doesnt matter
+    const regex = new RegExp(this.state.searchTerm, "\gi"); //indicates regex to apply globbally (g) and case insensitive (i) is applied
     const searchResults = channelMessages.reduce((acc, message) => { //apply .reduce to search through entire messages array, setting acc to empty array, setting iterator as 'message'
-      if (message.content && message.content.match(regex)) { //if message.content matches our regex, 
+      if (message.content && message.content.match(regex) || message.user.name.match(regex)) { //if message.content matches our regex, 
         acc.push(message); //we will push thee acc onto array
       }
       return acc;
