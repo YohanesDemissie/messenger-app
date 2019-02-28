@@ -16,6 +16,7 @@ class Messages extends React.Component {
     channel: this.props.currentChannel,
     isChannelStarred: false,
     user: this.props.currentUser,
+    usersRef: firebase.database().ref('users'),
     numUniqueUsers: "",
     searchTerm: '',
     searchLoading: false,
@@ -27,6 +28,7 @@ class Messages extends React.Component {
 
     if (channel && user) {
       this.addListeners(channel.id);
+      this.addUserStarsListener(channel.id, user.uid);
     }
   }
 
@@ -47,6 +49,21 @@ class Messages extends React.Component {
     });
   };
 
+  addUserStarsListener = (channelId, userId) => { //get all channels and relate them to what user has starred
+    this.state.usersRef
+      .child(userId) //select child based off user id
+      .child('starred') //get all starred props
+      .once('value') //get value
+      .then(data => {
+        if (data.val() !== null) { //make sure starred prop isn't null
+          const channelIds = Object.keys(data.val()); //gets id of all channels saved
+          const prevStarred = channelIds.includes(channelId); //sees if the current id is present
+          this.setState({ isChannelStarred: prevStarred }) //
+        }
+      })
+
+  }
+
   getMessagesRef = () => { //helper function to identify if it is a private message aka DM or regular public channel
     const { messagesRef, privateMessagesRef, privateChannel } = this.state;
     return privateChannel ? privateMessagesRef : messagesRef;
@@ -60,9 +77,27 @@ class Messages extends React.Component {
 
   starChannel = () => {
     if (this.state.isChannelStarred) {
-      console.log('star')
-    } else {
-      console.log('unstarred')
+      this.state.usersRef
+        .child(`${this.state.user.uid}/starred`) //select child of references based on user id
+        .update({ //dynamically change id of channeland its realted data
+          [this.state.channel.id]: {
+            name: this.state.channel.name,
+            details: this.state.channel.details,
+            createdBy: {
+              name: this.state.channel.createdBy.name,
+              avatar: this.state.channel.createdBy.avatar
+            }
+          }
+        })
+    } else { //else, take the same child id and apply the remove method
+      this.state.usersRef
+        .child(`${this.state.user.uid}/starred`)
+        .child(this.state.channel.id)
+        .remove(err => {
+          if (err !== null) {
+            console.errors(err)
+          }
+        })
     }
   }
 
