@@ -14,6 +14,7 @@ class Messages extends React.Component {
     messages: [],
     messagesLoading: true,
     channel: this.props.currentChannel,
+    isChannelStarred: false,
     user: this.props.currentUser,
     numUniqueUsers: "",
     searchTerm: '',
@@ -49,6 +50,20 @@ class Messages extends React.Component {
   getMessagesRef = () => { //helper function to identify if it is a private message aka DM or regular public channel
     const { messagesRef, privateMessagesRef, privateChannel } = this.state;
     return privateChannel ? privateMessagesRef : messagesRef;
+  }
+
+  handleStar = () => { //makes star boolean when clicked (on/off favorite/not-favorite)
+    this.setState(prevState => ({
+      isChannelStarred: !prevState.isChannelStarred,
+    }), () => this.starChannel())
+  }
+
+  starChannel = () => {
+    if (this.state.isChannelStarred) {
+      console.log('star')
+    } else {
+      console.log('unstarred')
+    }
   }
 
   handleSearchChange = event => {
@@ -98,7 +113,7 @@ class Messages extends React.Component {
   }
 
   render() {
-    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel } = this.state;
+    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
 
     return (
       <React.Fragment>
@@ -108,6 +123,8 @@ class Messages extends React.Component {
           handleSearchChange={this.handleSearchChange}
           searchLoading={searchLoading}
           isPrivateChannel={privateChannel}
+          handleStar={this.handleStar}
+          isChannelStarred={isChannelStarred}
         />
 
         <Segment>
