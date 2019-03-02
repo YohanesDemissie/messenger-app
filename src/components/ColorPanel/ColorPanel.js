@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
-import { Sidebar, Menu, Divider, Button } from 'semantic-ui-react'
+import { Sidebar, Menu, Divider, Button, Label } from 'semantic-ui-react'
 
 class ColorPanel extends Component {
+  state = {
+    modal: false,
+  }
+
+  openModal = () => this.setState({ modal: true});
+
+  closeModal = () => this.setState({ modal: false });
+
+
   render() {
     return(
       <Sidebar
@@ -13,7 +22,8 @@ class ColorPanel extends Component {
         // ColorPanel
       >
       <Divider />
-      <Button icon="add" size="small" color="blue" />
+      <Button icon="add" size="small" color="blue" onClick={this.openModal} />
+      {/* color picker Modal*/}
       </Sidebar>
     )
   }

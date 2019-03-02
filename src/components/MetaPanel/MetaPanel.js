@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Segment, Accordion, Header, Icon } from 'semantic-ui-react';
+import { Segment, Accordion, Header, Icon, Image, List } from 'semantic-ui-react';
 
 class MetaPanel extends Component {
   state = {
+    channel: this.props.currentChannel,
     privateChannel: this.props.isPrivateChanel,
     activeIndex: 0,
   }
@@ -12,17 +13,36 @@ class MetaPanel extends Component {
     const { activeIndex } = this.state; //grabbing active index from state
     const newIndex = activeIndex === index ? -1 : index; //update active index to new index
     this.setState({ activeIndex: newIndex }); //if active index = index of our titleProps, we give it the value of -1, otherwise set to new index
-  }
+  };
+
+  formatCount = num => (num > 1 || num === 0 ? `${num} posts` : `${num} post`);//if num = 1 or 0, render "post" ortherwise ""
+
+  displayTopPosters = posts => (
+    Object.entries(posts) //object.entries() takes in an object, and places each key/value pair into its own separate array within a larger array. In this case we are passing in all objects witihn posts
+      .sort((a, b) => b[1] - a[1]) //allows us to see in a descending order greatest counted posts to leatest counted posts
+      .map(([key, val], i) => ( //using map method  desturcutres each key and value of the array and use them to reference for display of our top posters in our markup later on
+        <List.Item key={i}> {/* i will be the current index reference while iterating through key, value arrays */}
+          <Image avatar src={val.avatar} />
+          <List.Content>
+            <List.Header as="a">{key}</List.Header>
+            <List.Description>{this.formatCount(val.count)} posts</List.Description>
+          </List.Content>
+        </List.Item>
+      ))
+      .slice(0, 5) //displays up to 5 top posters at a time
+  )
 
   render() {
-    const { activeIndex, privateChannel } = this.state;
+    const { activeIndex, privateChannel, channel } = this.state;
+    const { userPosts } = this.props;
 
+    // if (privateChannel || !channel) return null;
     if (privateChannel) return null;
 
     return (
-      <Segment>
+      <Segment loading={!channel}>
         <Header as="h3" attached="top">
-          About # Channel
+          About # {channel && channel.name}
         </Header>
         <Accordion styled attached="true">
           <Accordion.Title
@@ -35,7 +55,7 @@ class MetaPanel extends Component {
           Channel Details
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 0}>
-            details
+            {channel && channel.details}
         </Accordion.Content>
 
           <Accordion.Title
@@ -48,7 +68,9 @@ class MetaPanel extends Component {
             Top Posters
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 1}>
-            posters
+            <List>
+              {userPosts && this.displayTopPosters(userPosts)}
+            </List>
         </Accordion.Content>
 
           <Accordion.Title
@@ -61,7 +83,10 @@ class MetaPanel extends Component {
             Created By
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 2}>
-            creator
+            <Header as="h3">
+              <Image circular src={channel && channel.createdBy.avatar} />
+              {channel && channel.createdBy.name}
+            </Header>
         </Accordion.Content>
         </Accordion>
       </Segment>

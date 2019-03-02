@@ -1,5 +1,7 @@
 import React from "react";
 import { Segment, Comment } from "semantic-ui-react";
+import { connect } from 'react-redux';
+import { setUserPosts } from '../../actions';
 import firebase from "../../firebase";
 
 import MessagesHeader from "./MessagesHeader";
@@ -46,6 +48,7 @@ class Messages extends React.Component {
         messagesLoading: false
       });
       this.countUniqueUsers(loadedMessages);
+      this.countUserPosts(loadedMessages)
     });
   };
 
@@ -133,6 +136,22 @@ class Messages extends React.Component {
     this.setState({ numUniqueUsers });
   };
 
+  //REVIEW SECTION 13, LECTURE 49 @ BEGINNING THOROUGH REVIEWS
+  countUserPosts = messages => { //takes accumulator of messages for each channel
+    let userPosts = messages.reduce((acc, message) => { //userPosts will return the value of the function
+      if (message.user.name in acc) { //check if iterator 
+        acc[message.user.name].count += 1;
+      } else {
+        acc[message.user.name] = {
+          avatar: message.user.avatar,
+          count: 1
+        }
+      }
+      return acc;
+    }, {});
+    this.props.setUserPosts(userPosts);
+  }
+
   displayMessages = messages =>
     messages.length > 0 &&
     messages.map(message => (
@@ -181,7 +200,7 @@ class Messages extends React.Component {
   }
 }
 
-export default Messages;
+export default connect(null, { setUserPosts })(Messages);
 
 
 // import React, { Component } from 'react';
