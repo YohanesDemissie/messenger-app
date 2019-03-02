@@ -30,13 +30,13 @@ class ColorPanel extends Component {
         <Modal basic open={modal} onClose={this.closeModal}>
           <Modal.Header>Change Color Theme</Modal.Header>
           <Modal.Content>
-            <Segment>
+            <Segment width='40%'>
               <Label content="Primary Color" />
-              <HuePicker />
+              <HuePicker width='100%'/>
             </Segment>
             <Segment>
-              <Label content="Secondary Color" />
-              <HuePicker />
+              <Label content="Secondary Color" width='40%'/>
+              <HuePicker width='100%'/>
             </Segment>
           </Modal.Content>
           <Modal.Actions>
