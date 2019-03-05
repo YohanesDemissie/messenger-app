@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Sidebar, Menu, Divider, Button, Label, Modal, Icon, Segment } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { setColors } from '../../actions';
 //import { StarterPicker } from 'react-color'; //REALLY COOL CUSTOM THEME MAKER UI FOR THE USER!!! APPLIED IN MODEM.CONTENT TAGS BELOW
 import { HuePicker } from 'react-color';
 import firebase from '../../firebase';
@@ -11,7 +13,24 @@ class ColorPanel extends Component {
     secondary: '',
     user: this.props.currentUser,
     usersRef: firebase.database().ref('users'),
+    userColors: [],
   };
+
+  componentDidMount() {
+    if(this.state.user) {
+      this.addListener(this.state.user.uid)
+    }
+  }
+
+  addListener = userId => {
+    let userColors = []; //empty array to hold user colors
+    this.state.usersRef
+      .child(`${userId}/colors`) //gets everything on the colors property
+      .on('child_added', snap => {
+        userColors.unshift(snap.val()); //user the unshift method to put selected colors in the front of the array and pass the snap value
+        this.setState({ userColors })
+      })
+  }
 
   handleChangePrimary = color => this.setState({ primary: color.hex}); //read 'react-color' docs for ind-depth look at method. adding primary colors to state using hex code
 
@@ -37,13 +56,28 @@ class ColorPanel extends Component {
       .catch(err => console.error(err));
   }
 
+  displayUserColors = colors => (
+    colors.length > 0 && colors.map((color, i) => (
+      <React.Fragment key={i}>
+        <Divider />
+        <div className="color__container" onClick={() => this.props.setColors(color.primary, color.secondary)}>
+          <div className="color__square" style={{ background: color.primary }}>
+            <div className="color__overlay" style={{ background: color.secondary }}>
+            </div>
+
+          </div>
+        </div>
+      </React.Fragment>
+    ))
+  )
+
   openModal = () => this.setState({ modal: true});
 
   closeModal = () => this.setState({ modal: false });
 
 
   render() {
-    const { modal, primary, secondary } = this.state; //passing down state through ui, displaying users choice of colors
+    const { modal, primary, secondary, userColors } = this.state; //passing down state through ui, displaying users choice of colors
     return(
       <Sidebar
         as={Menu}
@@ -55,7 +89,7 @@ class ColorPanel extends Component {
       >
         <Divider />
         <Button icon="add" size="small" color="blue" onClick={this.openModal} />
-
+        {this.displayUserColors(userColors)}
         <Modal basic open={modal} onClose={this.closeModal}>
           <Modal.Header>Change Color Theme</Modal.Header>
           <Modal.Content>
@@ -82,4 +116,4 @@ class ColorPanel extends Component {
   }
 }
 
-export default ColorPanel;
+export default connect(null, { setColors })(ColorPanel);
