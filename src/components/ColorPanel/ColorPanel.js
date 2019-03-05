@@ -2,11 +2,40 @@ import React, { Component } from 'react';
 import { Sidebar, Menu, Divider, Button, Label, Modal, Icon, Segment } from 'semantic-ui-react';
 //import { StarterPicker } from 'react-color'; //REALLY COOL CUSTOM THEME MAKER UI FOR THE USER!!! APPLIED IN MODEM.CONTENT TAGS BELOW
 import { HuePicker } from 'react-color';
+import firebase from '../../firebase';
 
 class ColorPanel extends Component {
   state = {
     modal: false,
+    primary: '',
+    secondary: '',
+    user: this.props.currentUser,
+    usersRef: firebase.database().ref('users'),
   };
+
+  handleChangePrimary = color => this.setState({ primary: color.hex}); //read 'react-color' docs for ind-depth look at method. adding primary colors to state using hex code
+
+  handleChangeSecondary = color => this.setState({ secondary: color.hex }); //read 'react-color' docs for ind-depth look at method. 
+
+  handleSavedColors = () => {
+    if(this.state.primary && this.state.secondary) {
+      this.saveColors(this.state.primary, this.state.secondary);
+    }
+  }
+
+  saveColors = (primary, secondary) => {
+    this.state.usersRef
+      .child(`${this.state.user.uid}/colors`)
+      .push() //push unique identifier on 'colors' of user pick
+      .update({ //update new color hex code primary, secondary
+        primary, secondary
+      })
+      .then(() => {
+        console.log('colors added'); 
+        this.closeModal();
+      })
+      .catch(err => console.error(err));
+  }
 
   openModal = () => this.setState({ modal: true});
 
@@ -14,7 +43,7 @@ class ColorPanel extends Component {
 
 
   render() {
-    const { modal } = this.state;
+    const { modal, primary, secondary } = this.state; //passing down state through ui, displaying users choice of colors
     return(
       <Sidebar
         as={Menu}
@@ -30,17 +59,17 @@ class ColorPanel extends Component {
         <Modal basic open={modal} onClose={this.closeModal}>
           <Modal.Header>Change Color Theme</Modal.Header>
           <Modal.Content>
-            <Segment width='40%'>
+            <Segment inverted>
               <Label content="Primary Color" />
-              <HuePicker width='100%'/>
+              <HuePicker color={primary} onChange={this.handleChangePrimary} width='100%'/>
             </Segment>
-            <Segment>
-              <Label content="Secondary Color" width='40%'/>
-              <HuePicker width='100%'/>
+            <Segment inverted>
+              <Label content="Secondary Color" />
+              <HuePicker color={secondary} onChange={this.handleChangeSecondary} width='100%'/>
             </Segment>
           </Modal.Content>
           <Modal.Actions>
-            <Button color="green" inverted>
+            <Button color="green" inverted onClick={this.handleSavedColors}>
               <Icon name="checkmark" />Save Colors
             </Button>
             <Button color="red" inverted onClick={this.closeModal}>
