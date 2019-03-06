@@ -8,6 +8,7 @@ import MessagesHeader from "./MessagesHeader";
 import MessageForm from "./MessageForm";
 import Message from "./Message";
 import Typing from './Typing';
+import Skeleton from './Skeleton';
 
 class Messages extends React.Component {
   state = {
@@ -225,8 +226,18 @@ class Messages extends React.Component {
     ))
   )
 
+  displayMessagesSkeleton = loading => (
+    loading ? ( //if loadong is true, display React.Fragment...
+      <React.Fragment>
+        {[...Array(10)].map((_, i) => ( //use the Array constructor passing in 10 to get 10 elements and spread that result through .map to a new array only using index paramater in return...
+          <Skeleton key={i}/> //now iterating through our skeleton component 10 times with a key property set to index
+        ))}
+      </React.Fragment>
+    ) : null
+  ) 
+
   render() {
-    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred, typingUsers } = this.state;
+    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred, typingUsers, messagesLoading } = this.state;
 
     return (
       <React.Fragment>
@@ -242,6 +253,7 @@ class Messages extends React.Component {
 
         <Segment>
           <Comment.Group className="messages">
+            {this.displayMessagesSkeleton(messagesLoading)}
             {searchTerm ? this.displayMessages(searchResults) :
             this.displayMessages(messages)}
            {this.displayTypingUsers(typingUsers)}
