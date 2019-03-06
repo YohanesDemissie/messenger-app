@@ -40,7 +40,7 @@ class Messages extends React.Component {
 
   addListeners = channelId => {
     this.addMessageListener(channelId);
-    this.addTypingListeners(channelId)
+    this.addTypingListeners(channelId);
   };
 
   addTypingListeners = channelId => {
@@ -50,7 +50,7 @@ class Messages extends React.Component {
         typingUsers = typingUsers.concat({ // using .concat method to concat an obbject at end of array with id set to snap.key (to collect users ID) and name property to snap.value
           id: snap.key,
           name: snap.val()
-        })
+        });
         this.setState({ typingUsers })
       }
     })
@@ -59,9 +59,9 @@ class Messages extends React.Component {
       const index = typingUsers.findIndex(user => user.id === snap.key); //we are gonna toake tthe typing users array, use the findindex method to iterate all user elements and compare user.id to sanp.key
       if (index !== -1) { //if there is no index value that is positive...
         typingUsers = typingUsers.filter(user => user.id !== snap.key); //we will iterate over typing users array making sure none of the userId === snap.key
-        this.setState({ typingUsers })
+        this.setState({ typingUsers });
       }
-    })
+    });
 
     this.state.connectedRef.on('value', snap => { //take connected ref from state and listen for value change
       if (snap.val() === true) { //within the snap callback, make sure value is equal to true...
@@ -71,12 +71,12 @@ class Messages extends React.Component {
           .onDisconnect() //when our authorized user logs out...
           .remove(err => { //their value on the typing ref will be removed
             if  (err !== null) {
-              console.log(err)
+              console.error(err)
             }
-          })
+          });
       }
-    })
-  }
+    });
+  };
 
   addMessageListener = channelId => {
     let loadedMessages = [];
@@ -110,7 +110,7 @@ class Messages extends React.Component {
   getMessagesRef = () => { //helper function to identify if it is a private message aka DM or regular public channel
     const { messagesRef, privateMessagesRef, privateChannel } = this.state;
     return privateChannel ? privateMessagesRef : messagesRef;
-  }
+  };
 
   handleStar = () => { //makes star boolean when clicked (on/off favorite/not-favorite)
     this.setState(prevState => ({
@@ -209,7 +209,7 @@ class Messages extends React.Component {
   displayTypingUsers = users => (
     users.length > 0 && users.map(user => (
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.2em' }} key={user.id}>
-        <span className="user__typing">{user.name} is typing</span>
+        <span className="user__typing">{user.name} is typing</span> <Typing />
       </div>
     ))
   )
@@ -233,7 +233,7 @@ class Messages extends React.Component {
           <Comment.Group className="messages">
             {searchTerm ? this.displayMessages(searchResults) :
             this.displayMessages(messages)}
-           {this.displayTypingUsers}
+           {this.displayTypingUsers(typingUsers)}
           </Comment.Group>
         </Segment>
 

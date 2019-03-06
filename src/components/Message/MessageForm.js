@@ -24,17 +24,16 @@ class MessageForm extends Component {
   closeModal = () => this.setState({ modal: false });
 
   handleKeyDown = () => {
-    const { message, typingRef, channel, user } = this.state
+    const { message, typingRef, channel, user } = this.state;
     if (message) {
       typingRef
         .child(channel.id)
         .child(user.uid)
-        .set(user.displayName)
+        .set(user.displayName);
     } else {
       typingRef
         .child(channel.id)
         .child(user.uid)
-        .set(user.displayName)
         .remove();
     }
   }

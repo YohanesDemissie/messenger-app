@@ -89,7 +89,7 @@ body,
   background: #8d8c91;
   border-radius: 50%;
   opacity: 0;
-  animation: loadingFade is infinite;
+  animation: loadingFade 1s infinite;
 }
 
 .typing__dot:nth-child(1) { /* grabs the first element of classname typing__dot*/
