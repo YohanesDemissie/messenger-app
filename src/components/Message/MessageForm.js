@@ -4,6 +4,8 @@ import { Segment, Button, Input } from 'semantic-ui-react'
 import firebase from '../../firebase';
 import FileModal from './FileModal';
 import ProgressBar from './ProgressBar';
+import { Picker, emojiIndex } from 'emoji-mart'; //USE FOR FUTURE REFERENCE ADDING EMOJIS TO KEYBOARD
+import 'emoji-mart/css/emoji-mart.css'
 
 class MessageForm extends Component {
   state = {
@@ -17,7 +19,8 @@ class MessageForm extends Component {
     user: this.props.currentUser,
     loading: false,
     errors: [],
-    modal: false
+    modal: false,
+    emojiPicker: false,
   }
 
   openModal = () => this.setState({ modal: true });
@@ -40,6 +43,31 @@ class MessageForm extends Component {
 
   handleChange = event => { //used to handle prop change in message input
     this.setState({ [event.target.name]: event.target.value })
+  }
+
+  handleTogglePicker = () => {
+    this.setState({ emojiPicker: !this.state.emojiPicker })
+  }
+
+  handleAddEmoji = emoji => {
+    const oldMessage = this.state.message;
+    const newMessage = this.colonToUnicode(` ${oldMessage} ${emoji.colons}`);
+    this.setState({ message: newMessage, emojiPicker: false })
+  }
+
+  colonToUnicode = message => {
+    return message.replace(/:[A-Za-z0-9_+-]+:/g, x => { //crazy regex stuff
+      x = x.replace(/:/g, "");
+      let emoji = emojiIndex.emojis[x];
+      if (typeof emoji !== 'undefined') {
+        let unicode = emoji.native;
+        if (typeof unicode !== "undefined") {
+          return unicode;
+        }
+      }
+      x = ":" + x + ":";
+      return x;
+    });
   }
 
   createMessage = (fileUrl = null) => {
@@ -156,9 +184,18 @@ class MessageForm extends Component {
   }
 
   render() {
-    const { errors, message, loading, modal, uploadState, percentUploaded } = this.state //passing in error for sending empty string message, passing message... for obvious reasons, and loading to false, temporary, when message is sent so button isn't accidentally pressed twice
+    const { errors, message, loading, modal, uploadState, percentUploaded, emojiPicker } = this.state //passing in error for sending empty string message, passing message... for obvious reasons, and loading to false, temporary, when message is sent so button isn't accidentally pressed twice
     return(
       <Segment className="message__form">
+        {emojiPicker && (
+          <Picker
+            set="apple"
+            onSelect={this.handleAddEmoji}
+            className="emojipicker"
+            title="pick your emoji"
+            emoji="pint_up"
+          />
+        )}
         <Input
           fluid
           name="message"
@@ -166,7 +203,7 @@ class MessageForm extends Component {
           onKeyDown={this.handleKeyDown}
           value={message}
           style={{ marginBottom: "0.7em" }}
-          label={<Button icon={'add'} />}
+          label={<Button icon={'add'} onClick={this.handleTogglePicker} />}
           labelPosition="left"
           className={
             errors.some(error => error.message.includes('message')) ? 'error' : ''
