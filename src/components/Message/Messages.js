@@ -7,6 +7,7 @@ import firebase from "../../firebase";
 import MessagesHeader from "./MessagesHeader";
 import MessageForm from "./MessageForm";
 import Message from "./Message";
+import Typing from './Typing';
 
 class Messages extends React.Component {
   state = {
@@ -23,6 +24,9 @@ class Messages extends React.Component {
     searchTerm: '',
     searchLoading: false,
     searchResults: [],
+    typingRef: firebase.database().ref('typing'),
+    typingUsers: [],
+    connectedRef: firebase.database().ref('.info/connected'),
   };
 
   componentDidMount() {
@@ -36,7 +40,43 @@ class Messages extends React.Component {
 
   addListeners = channelId => {
     this.addMessageListener(channelId);
+    this.addTypingListeners(channelId)
   };
+
+  addTypingListeners = channelId => {
+    let typingUsers = []; //empty array to collect all users typing within a given channel
+    this.state.typingRef.child(channelId).on('child_added', snap => { //pass in channelId and listen for the 'child_Added' event
+      if (snap.key !== this.state.user.uid) { //within the snap, we will first see if snap.key is not equal to user.uid so we are not collecting current user to typing array
+        typingUsers = typingUsers.concat({ // using .concat method to concat an obbject at end of array with id set to snap.key (to collect users ID) and name property to snap.value
+          id: snap.key,
+          name: snap.val()
+        })
+        this.setState({ typingUsers })
+      }
+    })
+
+    this.state.typingRef.child(channelId).on('child_removed', snap => { //using the snap callback...
+      const index = typingUsers.findIndex(user => user.id === snap.key); //we are gonna toake tthe typing users array, use the findindex method to iterate all user elements and compare user.id to sanp.key
+      if (index !== -1) { //if there is no index value that is positive...
+        typingUsers = typingUsers.filter(user => user.id !== snap.key); //we will iterate over typing users array making sure none of the userId === snap.key
+        this.setState({ typingUsers })
+      }
+    })
+
+    this.state.connectedRef.on('value', snap => { //take connected ref from state and listen for value change
+      if (snap.val() === true) { //within the snap callback, make sure value is equal to true...
+        this.state.typingRef //then take the typing ref...
+          .child(channelId) //take the child on it of 'childId...
+          .child(this.state.user.uid) //child of current users, user ID...
+          .onDisconnect() //when our authorized user logs out...
+          .remove(err => { //their value on the typing ref will be removed
+            if  (err !== null) {
+              console.log(err)
+            }
+          })
+      }
+    })
+  }
 
   addMessageListener = channelId => {
     let loadedMessages = [];
@@ -166,8 +206,16 @@ class Messages extends React.Component {
     return channel ? `${this.state.privateChannel ? '@' : '#'}${channel.name}` : '';
   }
 
+  displayTypingUsers = users => (
+    users.length > 0 && users.map(user => (
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.2em' }} key={user.id}>
+        <span className="user__typing">{user.name} is typing</span>
+      </div>
+    ))
+  )
+
   render() {
-    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
+    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred, typingUsers } = this.state;
 
     return (
       <React.Fragment>
@@ -185,6 +233,7 @@ class Messages extends React.Component {
           <Comment.Group className="messages">
             {searchTerm ? this.displayMessages(searchResults) :
             this.displayMessages(messages)}
+           {this.displayTypingUsers}
           </Comment.Group>
         </Segment>
 
