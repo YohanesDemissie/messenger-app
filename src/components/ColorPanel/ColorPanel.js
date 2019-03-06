@@ -22,6 +22,10 @@ class ColorPanel extends Component {
     }
   }
 
+  componentWillUnmount() {
+    
+  }
+
   addListener = userId => {
     let userColors = []; //empty array to hold user colors
     this.state.usersRef

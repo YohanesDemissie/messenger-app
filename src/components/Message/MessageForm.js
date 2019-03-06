@@ -26,7 +26,11 @@ class MessageForm extends Component {
   openModal = () => this.setState({ modal: true });
   closeModal = () => this.setState({ modal: false });
 
-  handleKeyDown = () => {
+  handleKeyDown = event => {
+    //if (event.ctrlKey && event.keyCode === 13) { //checking if they press contorl key or 'event.keyCode === 13' which means 'the return key'
+    if (event.keyCode === 13) { //changed original statement to just press the enter button instead of control AND return
+      this.sendMessage();
+    }
     const { message, typingRef, channel, user } = this.state;
     if (message) {
       typingRef
