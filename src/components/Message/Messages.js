@@ -43,12 +43,12 @@ class Messages extends React.Component {
 
   componentWillUnmount() {
     this.removeListeners(this.state.listeners);
-    this.state.connectedRef.off()
+    this.state.connectedRef.off();
   }
 
   removeListeners = listeners => {
     listeners.forEach(listener => {
-      listeners.ref.child(listener.id).off(listener.event);
+      listener.ref.child(listener.id).off(listener.event);
     })
   }
 

@@ -47,7 +47,7 @@ class UserPanel extends Component {
   uploadCroppedImage = () => {
     const { storageRef, userRef, blob, metadata } = this.state;
     storageRef
-    .child(`avatar/user-${userRef.uid}`) //first we are going to grab the current users uid...
+    .child(`avatar/users/${userRef.uid}`) //first we are going to grab the current users uid...
     .put(blob, metadata) //applying restful api 'put' method to put our image in the firebase storage. also passing in meta data for additional info on content
     .then(snap => {
       snap.ref.getDownloadURL().then(downloadURL => { //get the snap back after uploading the image and on the ref property, execute the getDownloadURL method

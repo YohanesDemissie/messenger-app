@@ -19,7 +19,7 @@ class Starred extends Component {
   }
 
   componentWillUnmount() {
-    this.removeListener()
+    this.removeListener();
   }
 
   removeListener = () => {
