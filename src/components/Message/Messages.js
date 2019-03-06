@@ -38,6 +38,17 @@ class Messages extends React.Component {
     }
   }
 
+  //Next to functions are for auto scrolling to bottom of message thread when new messages arrive
+  componentDidUpdate() { //with this lifecycle method, we have access to previousProps and previous state
+    if (this.messagesEnd) {
+      this.scrollToBottom();
+    }
+  }
+
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({ behavior: 'smooth' });
+  }
+
   addListeners = channelId => {
     this.addMessageListener(channelId);
     this.addTypingListeners(channelId);
@@ -234,6 +245,7 @@ class Messages extends React.Component {
             {searchTerm ? this.displayMessages(searchResults) :
             this.displayMessages(messages)}
            {this.displayTypingUsers(typingUsers)}
+            <div ref={node => (this.messagesEnd = node)}></div>
           </Comment.Group>
         </Segment>
 
