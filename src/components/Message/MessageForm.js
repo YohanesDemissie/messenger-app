@@ -23,6 +23,13 @@ class MessageForm extends Component {
     emojiPicker: false,
   }
 
+  componentWillUnmount() { //cancel any uploads that might be taking place once the user has already uploaded or canceled any media
+    if (this.state.uploadTask !== null) {
+      this.state.uploadTask.cancel();
+      this.setState({ uploadTask: null });
+    }
+  }
+
   openModal = () => this.setState({ modal: true });
   closeModal = () => this.setState({ modal: false });
 

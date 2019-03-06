@@ -28,21 +28,44 @@ class Messages extends React.Component {
     typingRef: firebase.database().ref('typing'),
     typingUsers: [],
     connectedRef: firebase.database().ref('.info/connected'),
+    listeners: [],
   };
 
   componentDidMount() {
-    const { channel, user } = this.state;
+    const { channel, user, listeners } = this.state;
 
     if (channel && user) {
+      this.removeListeners(listeners)
       this.addListeners(channel.id);
       this.addUserStarsListener(channel.id, user.uid);
     }
+  }
+
+  componentWillUnmount() {
+    this.removeListeners(this.state.listeners);
+    this.state.connectedRef.off()
+  }
+
+  removeListeners = listeners => {
+    listeners.forEach(listener => {
+      listeners.ref.child(listener.id).off(listener.event);
+    })
   }
 
   //Next to functions are for auto scrolling to bottom of message thread when new messages arrive
   componentDidUpdate() { //with this lifecycle method, we have access to previousProps and previous state
     if (this.messagesEnd) {
       this.scrollToBottom();
+    }
+  }
+
+  addToListeners = (id, ref, event) => {
+    const index = this.state.listeners.findIndex(listener => {
+      return listener.id === id && listener.ref === ref && listener.event === event;
+    })
+    if (index === -1) {
+      const newListener = { id, ref, event }
+      this.setState({ listeners: this.state.listeners.concat(newListener) });
     }
   }
 
@@ -66,6 +89,7 @@ class Messages extends React.Component {
         this.setState({ typingUsers })
       }
     })
+    this.addToListeners(channelId, this.state.typingRef, 'child_added');
 
     this.state.typingRef.child(channelId).on('child_removed', snap => { //using the snap callback...
       const index = typingUsers.findIndex(user => user.id === snap.key); //we are gonna toake tthe typing users array, use the findindex method to iterate all user elements and compare user.id to sanp.key
@@ -74,6 +98,8 @@ class Messages extends React.Component {
         this.setState({ typingUsers });
       }
     });
+    this.addToListeners(channelId, this.state.typingRef, 'child_removed');
+
 
     this.state.connectedRef.on('value', snap => { //take connected ref from state and listen for value change
       if (snap.val() === true) { //within the snap callback, make sure value is equal to true...
@@ -102,7 +128,9 @@ class Messages extends React.Component {
       this.countUniqueUsers(loadedMessages);
       this.countUserPosts(loadedMessages)
     });
+    this.addToListeners(channelId, ref, 'child_added');
   };
+
 
   addUserStarsListener = (channelId, userId) => { //get all channels and relate them to what user has starred
     this.state.usersRef
@@ -234,7 +262,7 @@ class Messages extends React.Component {
         ))}
       </React.Fragment>
     ) : null
-  ) 
+  )
 
   render() {
     const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred, typingUsers, messagesLoading } = this.state;
