@@ -9,3 +9,22 @@ https://medium.com/agora-io/add-video-calling-in-cross-platform-mobile-apps-usin
 
 #Section 18 lecture 63
 learn how to use componentWillUnmount() take notes on this video and rewatch to get an in-depth understanding
+
+#database.rules.json
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+#firebase.json
+{
+  "hosting": {
+    "public": "./build"
+  },
+  "database": {
+    "rules": "database.rules.json"
+  }
+}
+
